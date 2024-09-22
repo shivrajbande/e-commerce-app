@@ -14,76 +14,119 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-                backgroundColor: ColorCodes.primaryBg,
+        backgroundColor: ColorCodes.primaryBg,
         body: Padding(
-        padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-               "e-Shop",
-                style: FontManager.getTextStyle(
-                  context,
-                  color: ColorCodes.primaryButtonBg,
-                  fontSize: 20,
-                  lWeight: FontWeight.w700
-                ),
+                "e-Shop",
+                style: FontManager.getTextStyle(context,
+                    color: ColorCodes.primaryButtonBg,
+                    fontSize: 20,
+                    lWeight: FontWeight.w700),
                 textAlign: TextAlign.start,
               ),
               SizedBox(
-                height: MediaQuery.of(context).size.height / 6,
+                height: MediaQuery.of(context).size.height / 4.5,
                 child: Form(
                   key: _formKey,
                   child: Column(
-                   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          border: InputBorder.none,
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide:
-                                const BorderSide(color: Colors.transparent),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 60, // Ensure fixed height for the field
+                            child: TextFormField(
+                              controller: Provider.of<AuthProvider>(context)
+                                  .emailController,
+                              decoration: InputDecoration(
+                                labelText: 'Email',
+                                border: InputBorder.none,
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide: const BorderSide(
+                                      color: Colors.transparent),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide: const BorderSide(
+                                      color: Colors.transparent),
+                                ),
+                                constraints:
+                                    const BoxConstraints(maxHeight: 40.0),
+                                filled: true,
+                                fillColor: Colors.white,
+                              ),
+                              obscureText: false,
+                            ),
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide:
-                                const BorderSide(color: Colors.transparent),
+                          // Error Message for Password
+                          Consumer<AuthProvider>(
+                            builder: (context, provider, child) =>
+                                provider.emailError != null
+                                    ? Container(
+                                        padding:
+                                            const EdgeInsets.only(left: 12.0),
+                                        child: Text(
+                                          provider.emailError!,
+                                          style: const TextStyle(
+                                              color: Colors.red, fontSize: 12),
+                                        ),
+                                      )
+                                    : const SizedBox.shrink(),
                           ),
-                          constraints: const BoxConstraints(maxHeight: 40.0),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        controller:
-                            Provider.of<AuthProvider>(context).emailController,
-                        validator: (value) =>
-                            value!.isEmpty ? 'Please enter your email' : null,
+                        ],
                       ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          border: InputBorder.none,
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide:
-                                const BorderSide(color: Colors.transparent),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 60, // Ensure fixed height for the field
+                            child: TextFormField(
+                              controller: Provider.of<AuthProvider>(context)
+                                  .passwordController,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                border: InputBorder.none,
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide: const BorderSide(
+                                      color: Colors.transparent),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide: const BorderSide(
+                                      color: Colors.transparent),
+                                ),
+                                constraints:
+                                    const BoxConstraints(maxHeight: 40.0),
+                                filled: true,
+                                fillColor: Colors.white,
+                              ),
+                              obscureText: true,
+                            ),
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide:
-                                const BorderSide(color: Colors.transparent),
+                          // Error Message for Password
+                          Consumer<AuthProvider>(
+                            builder: (context, provider, child) =>
+                                provider.passwordError != null
+                                    ? Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 12.0),
+                                        child: Text(
+                                          provider.passwordError!,
+                                          style: const TextStyle(
+                                              color: Colors.red, fontSize: 12),
+                                        ),
+                                      )
+                                    : const SizedBox.shrink(),
                           ),
-                          constraints: const BoxConstraints(maxHeight: 40.0),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        obscureText: true,
-                        controller: Provider.of<AuthProvider>(context)
-                            .passwordController,
-                        validator: (value) =>
-                            value!.length < 6 ? 'Password too short' : null,
+                        ],
                       ),
                     ],
                   ),
@@ -96,21 +139,25 @@ class LoginScreen extends StatelessWidget {
                       text: "login",
                       textFontSize: 16,
                       onTap: () async {
-                        await Provider.of<AuthProvider>(context, listen: false)
-                            .login(context);
+                        if (Provider.of<AuthProvider>(context, listen: false)
+                            .validateForm()) {
+                          await Provider.of<AuthProvider>(context,
+                                  listen: false)
+                              .signup(context);
+                        }
                       },
-                       bgColor: ColorCodes.primaryButtonBg,
+                      bgColor: ColorCodes.primaryButtonBg,
                       textColor: Colors.white,
-
                     ),
                     Container(
-                       margin: const EdgeInsets.only(top: 10.0),
+                      margin: const EdgeInsets.only(top: 10.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             "New here? ",
-                            style: FontManager.getTextStyle(context,   fontSize: 16),
+                            style:
+                                FontManager.getTextStyle(context, fontSize: 16),
                           ),
                           InkWell(
                             onTap: () {
@@ -121,7 +168,9 @@ class LoginScreen extends StatelessWidget {
                             child: Text(
                               "Signup",
                               style: FontManager.getTextStyle(context,
-                                  color: ColorCodes.primaryButtonBg,   fontSize: 16,lWeight: FontWeight.w700),
+                                  color: ColorCodes.primaryButtonBg,
+                                  fontSize: 16,
+                                  lWeight: FontWeight.w700),
                             ),
                           ),
                         ],

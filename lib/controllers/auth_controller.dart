@@ -9,8 +9,40 @@ class AuthProvider extends ChangeNotifier {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool? isLoading = false;
+  String? nameError;
+  String? emailError;
+  String? passwordError;
+
 
   final AuthService _authService = AuthService();
+
+  bool validateForm() {
+    bool isValid = true;
+    
+    if (nameController.text.isEmpty) {
+      nameError = "Please enter your name";
+      isValid = false;
+    } else {
+      nameError = null;
+    }
+
+    if (emailController.text.isEmpty) {
+      emailError = "Please enter your email";
+      isValid = false;
+    } else {
+      emailError = null;
+    }
+
+    if (passwordController.text.length < 6) {
+      passwordError = "Password too short";
+      isValid = false;
+    } else {
+      passwordError = null;
+    }
+
+    notifyListeners();
+    return isValid;
+  }
 
   Future<void> signup(context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
